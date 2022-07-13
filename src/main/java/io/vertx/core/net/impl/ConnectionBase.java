@@ -22,6 +22,7 @@ import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.FutureListener;
 import io.vertx.core.*;
 import io.vertx.core.impl.ContextInternal;
+import io.vertx.core.impl.VertxImpl;
 import io.vertx.core.impl.future.PromiseInternal;
 import io.vertx.core.impl.VertxInternal;
 import io.vertx.core.impl.logging.Logger;
@@ -577,7 +578,7 @@ public abstract class ConnectionBase {
       } else {
         java.net.SocketAddress addr = chctx.channel().remoteAddress();
         if (addr != null) {
-          address = vertx.transport().convert(addr);
+          address = ((VertxImpl)vertx).transport().convert(addr);
         }
       }
 
@@ -595,7 +596,7 @@ public abstract class ConnectionBase {
       } else {
         java.net.SocketAddress addr = chctx.channel().localAddress();
         if (addr != null) {
-          address = vertx.transport().convert(addr);
+          address = ((VertxImpl)vertx).transport().convert(addr);
         }
       }
 
