@@ -93,14 +93,9 @@ public class HostnameResolutionTest extends VertxTestBase {
   }
 
   @Test
-  public void testAsyncResolveTruncated() throws Exception {
+  public void testAsyncResolveTruncated() {
 
-    dnsServer.store(new RecordStore() {
-      @Override
-      public Set<ResourceRecord> getRecords(QuestionRecord question) throws DnsException {
-        return Collections.singleton(new FakeDNSServer.VertxResourceRecord("vertx.io", "127.0.0.1").setTruncated(true));
-      }
-    });
+    dnsServer.store(question -> Collections.singleton(new FakeDNSServer.VertxResourceRecord("vertx.io", "127.0.0.1").setTruncated(true)));
 
 
     ((VertxImpl) vertx).resolveAddress("vertx.io", onSuccess(resolved -> {
@@ -111,7 +106,7 @@ public class HostnameResolutionTest extends VertxTestBase {
   }
 
   @Test
-  public void testAsyncResolveFail() throws Exception {
+  public void testAsyncResolveFail() {
     ((VertxImpl) vertx).resolveAddress("vertx.com", onFailure(failure -> {
       assertTrue("Was expecting " + failure + " to be an instanceof UnknownHostException", failure instanceof UnknownHostException);
       testComplete();
@@ -802,6 +797,23 @@ public class HostnameResolutionTest extends VertxTestBase {
             fail(res2.cause());
           }
         });
+      } else {
+        fail(res.cause());
+      }
+    });
+
+    await();
+  }
+
+
+  @Test
+  public void testResolveAllLocalhost() {
+    AddressResolver resolver = new AddressResolver((VertxImpl) vertx, new AddressResolverOptions());
+
+    resolver.resolveHostnameAll("LOCALHOST", res -> {
+      if (res.succeeded()) {
+        System.out.println(res.result());
+        //assertEquals("localhost", res.result().getHostName().toLowerCase(Locale.ENGLISH));
       } else {
         fail(res.cause());
       }
